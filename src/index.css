@@ -10,8 +10,10 @@
 
 :root {
   --color-primary: #55038c;
-  --color-primary-hover: #3E0561;
-  --color-text: #F7EBFE;
+  --color-primary-hover: #3e0561;
+  --color-text: #f7ebfe;
+  /* --color-highlighter: #00FFAA; */
+  --font-color: #85DAFF;
 }
 
 body {

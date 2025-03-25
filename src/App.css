@@ -16,17 +16,20 @@
 }
 
 h1 {
-  font-size: 2.5em; /* Tamanho reduzido para mobile */
-  padding: 0.5em 0;
+  font-size: 2.7em; /* Tamanho reduzido para mobile */
+  padding: 0.2em 0;
+  color: var(--font-color);
 }
 
-.highlight-1,
+/* .highlight-1,
 .highlight-2 {
-  background: var(--color-primary);
+  background: var(--color-highlighter);
   padding: 2px 4px;
   box-decoration-break: clone;
-  display: inline-block; /* Melhora o comportamento em quebras de linha */
+  display: inline-block; /* Melhora o comportamento em quebras de linha 
+  
 }
+  */
 
 .paragraph {
   line-height: 1.8; /* Reduzido para mobile */
