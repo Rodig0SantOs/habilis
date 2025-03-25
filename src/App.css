@@ -1,0 +1,143 @@
+.container {
+  background-image: url("./image/fundo_7.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh; /* Alterado para min-height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px; /* Adicionado padding para evitar colar nas bordas */
+}
+
+.content {
+  width: 80%; /* Aumentado para mobile */
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 2.5em; /* Tamanho reduzido para mobile */
+  padding: 0.5em 0;
+}
+
+.highlight-1,
+.highlight-2 {
+  background: var(--color-primary);
+  padding: 2px 4px;
+  box-decoration-break: clone;
+  display: inline-block; /* Melhora o comportamento em quebras de linha */
+}
+
+.paragraph {
+  line-height: 1.8; /* Reduzido para mobile */
+  margin-bottom: 1em;
+  padding: 1em 0;
+  font-size: 1.5em; /* Tamanho de fonte ajustado */
+}
+
+.btn {
+  /* Estilos básicos */
+  background: var(--color-text);
+  border: 2px solid var(--color-text);
+  padding: 16px 32px;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  /* Estilos do texto */
+  color: #55038c;
+  font-weight: 600;
+  text-decoration: none;
+
+  /* Efeito hover/interação */
+  &:hover {
+    background-color: rgba(85, 3, 140, 0.1);
+    color: var(--color-text);
+    transform: translateY(-2px);
+  }
+
+  /* Foco acessível */
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(85, 3, 140, 0.3);
+  }
+}
+
+/* Desktop Médio (hd) */
+@media (max-width: 1280px) {
+  .content p {
+    width: 70%;
+    padding: 0.5em;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+  }
+}
+
+/* Tablet Horizontal (hd) */
+@media (max-width: 884px) {
+  .content p {
+    width: 100%;
+  }
+
+  .btn {
+    background: #55038c;
+    color: white;
+    font-weight: bold;
+  }
+}
+
+/* Tablet Vertical (md) */
+@media (max-width: 768px) {
+  .content {
+    width: 100vw;
+  }
+
+  h1 {
+    font-size: 1.8em;
+    padding: 0.5em 0;
+  }
+
+  .content p {
+    width: 100%;
+    font-size: 1em;
+  }
+
+  .highlight-1,
+  .highlight-2 {
+    width: 100%;
+    padding: 4px 6px;
+    color: #fff;
+    background: #55038c;
+  }
+}
+
+/* Mobile (sm) */
+@media (max-width: 480px) {
+  .content {
+    padding: 1px;
+  }
+
+  h1 {
+    font-size: 1.6em;
+  }
+
+  .highlight-1,
+  .highlight-2 {
+    padding: 8px;
+  }
+
+  content p {
+    font-size: 1.1em;
+  }
+
+  .content p {
+    width: 100%;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 12px 24px;
+    font-size: 0.95em;
+  }
+}

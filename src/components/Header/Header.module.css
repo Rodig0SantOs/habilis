@@ -1,0 +1,82 @@
+.container {
+  position: fixed; /* Fixa o header */
+  top: 0; /* Cola no topo da viewport */
+  left: 0; /* Garante alinhamento à esquerda */
+  width: 100%;
+  padding: 1em 0;
+  z-index: 1; /* Garante que fique acima de outros elementos */
+  background-color: transparent; /* Cor inicial do header */
+  transition: background-color 0.3s ease; /* Adiciona uma transição suave */
+}
+
+.scrolled {
+  position: absolute;
+  background-color: var(--color-primary); /* Cor do header ao scrollar */
+}
+
+.content {
+  width: 80%;
+  margin: 0 auto;
+  padding: 0.5em 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logoImage {
+  width: 50px;
+  cursor: pointer;
+}
+
+nav {
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 1em;
+
+    li {
+      a {
+        font-size: 1.9em;
+        color: #fff;
+        text-decoration: none;
+        &:hover {
+          color: var(--color-primary-hover);
+        }
+      }
+    }
+  }
+}
+
+/* Estilos para mobile */
+@media (max-width: 768px) {
+  .container {
+    position: fixed; /* Remove o posicionamento fixo */
+    height: auto;
+    z-index: auto; /* Remove o z-index */
+    padding: 0.5em 0;
+  }
+
+  .content {
+    width: 80%;
+    gap: 1em;
+    padding: 1em 0;
+  }
+
+  nav ul {
+    flex-wrap: wrap; /* Permite que os itens quebrem linha */
+    justify-content: center; /* Centraliza os itens */
+    gap: 0.5em; /* Reduz o espaçamento entre itens */
+  }
+
+  nav li a {
+    font-size: 1.2em !important; /* Reduz o tamanho da fonte */
+    padding: 0.3em 0.5em; /* Aumenta a área de toque */
+  }
+
+  .logoImage {
+    width: 40px; /* Ajusta o logo para mobile */
+  }
+}
