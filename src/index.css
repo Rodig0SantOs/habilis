@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
 
 *,
 :before,
@@ -12,14 +12,13 @@
   --color-primary: #55038c;
   --color-primary-hover: #3e0561;
   --color-text: #f7ebfe;
-  /* --color-highlighter: #00FFAA; */
   --font-color: #85DAFF;
 }
 
 body {
   background-color: #000;
   color: #fff;
-  font-family: "Montserrat", sans-serif;
+  font-family: "Rubik", sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
