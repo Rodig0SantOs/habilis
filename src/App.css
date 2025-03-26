@@ -84,8 +84,12 @@ h1 {
 
 /* Tablet Horizontal (hd) */
 @media (max-width: 884px) {
+  .container {
+    width: 100vw;
+  }
+
   .content p {
-    width: 100%;
+    width: 95%;
   }
 
   .btn {
@@ -103,17 +107,17 @@ h1 {
   }
 
   h1 {
-    font-size: 1.8em;
+    font-size: 2em;
     padding: 0.5em 0;
   }
 
   .content p {
     width: 100%;
-    font-size: 1em;
+    font-size: 1.2em;
   }
+
   .btn {
-    width: 50%;
-    padding: 12px 24px;
+    width: 85%;
     font-size: 1em;
   }
 }
@@ -128,11 +132,28 @@ h1 {
     font-size: 1.6em;
   }
 
-  content p {
-    font-size: 1.1em;
+  .content p {
+    width: 100%;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 12px 24px;
+    font-size: 0.95em;
+  }
+}
+
+@media (max-width: 320px) {
+  .content {
+    padding: 1px;
+  }
+
+  h1 {
+    font-size: 1.3em;
   }
 
   .content p {
+    font-size: .9em;
     width: 100%;
   }
 
