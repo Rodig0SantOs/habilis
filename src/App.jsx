@@ -18,7 +18,7 @@ function App() {
         </h1>
         <p className="paragraph">
           <p className="paragraph2">
-            Bem vindo ao canal de denuncias relacionados a Habilis. <br />
+            Bem-vindo ao canal de denuncias relacionadas a Habilis. <br />
           </p>
           Presenciou ou tem conhecimento de um Incidente envolvendo a Habilis?
           <br />
