@@ -38,3 +38,9 @@ input[type="submit"] {
 input[type="submit"]:hover {
   background-color: #21E8C0;
 }
+
+@media (min-width: 768px) {
+  input[type="submit"] {
+    width: auto;
+  }
+}

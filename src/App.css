@@ -41,7 +41,7 @@ h1 {
 }
 
 .paragraph2 {
-  margin-bottom: .5em;
+  margin-bottom: 0.5em;
   font-weight: bold;
 }
 
@@ -78,9 +78,6 @@ h1 {
 /* Desktop Médio (hd) */
 @media (max-width: 1280px) {
   .content p {
-    width: 70%;
-    padding: 0.5em;
-    background: rgba(0, 0, 0, 0.4);
     border-radius: 8px;
   }
 }
@@ -95,6 +92,7 @@ h1 {
     background: #55038c;
     color: white;
     font-weight: bold;
+    width: 100%;
   }
 }
 
@@ -113,13 +111,10 @@ h1 {
     width: 100%;
     font-size: 1em;
   }
-
-  .highlight-1,
-  .highlight-2 {
-    width: 100%;
-    padding: 4px 6px;
-    color: #fff;
-    background: #55038c;
+  .btn {
+    width: 50%;
+    padding: 12px 24px;
+    font-size: 1em;
   }
 }
 
@@ -131,11 +126,6 @@ h1 {
 
   h1 {
     font-size: 1.6em;
-  }
-
-  .highlight-1,
-  .highlight-2 {
-    padding: 8px;
   }
 
   content p {
