@@ -17,8 +17,10 @@ function App() {
           <span class="highlight-2">Incident Response Team) Habilis</span>
         </h1>
         <p className="paragraph">
-          Bem vindo ao canal de denuncias relacionados a Habilis. <br />
-          Presenciou ou tem conhecimento de um Incidente envolvendo a Habilis?{" "}
+          <p className="paragraph2">
+            Bem vindo ao canal de denuncias relacionados a Habilis. <br />
+          </p>
+          Presenciou ou tem conhecimento de um Incidente envolvendo a Habilis?
           <br />
           Clique no botão abaixo e preencha o formulário para registrar sua
           denúncia.

@@ -40,6 +40,11 @@ h1 {
   font-weight: 300;
 }
 
+.paragraph2 {
+  margin-bottom: .5em;
+  font-weight: bold;
+}
+
 .btn {
   /* Estilos básicos */
   background: var(--color-text);
