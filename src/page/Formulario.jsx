@@ -4,8 +4,7 @@ import FormField from "../utils/form";
 import Footer from "../components/Footer/Footer";
 
 const Formulario = () => {
-  const formRef = useRef(null); // Ref para o formulário
-
+  const formRef = useRef(null);
   const handleSubmit = async (e) => {
     e.preventDefault();
   };
@@ -30,14 +29,13 @@ const Formulario = () => {
             />
             <FormField
               label="Data e hora do incidente. *Obrigatória"
-              type="text"
+              type="datetime-local"
               name="data_hora"
-              placeholder="Digite a data e hora do incidente"
               required
             />
             <FormField
               label="Descrição detalhada do incidente: Explique o que aconteceu, como aconteceu e quaisquer observações relevantes. *obrigatória"
-              type="text"
+              type="textarea"
               name="descricao"
               placeholder="Descreva o incidente detalhadamente"
               required
@@ -51,27 +49,21 @@ const Formulario = () => {
             />
             <FormField
               label="O incidente gerou algum impacto operacional? (interrupção nas operações das áreas de negócios, impacto a marca, impacto na cadeia de suprimentos). *obrigatória"
-              type="text"
+              type="textarea"
               name="impacto"
               placeholder="Descreva o impacto operacional"
               required
             />
             <FormField
-              label="Existem evidências ou logs relacionados ao incidente? (anexar se possível)."
-              type="text"
-              name="evidencias"
-              placeholder="Descreva ou anexe as evidências"
-            />
-            <FormField
               label="O que foi feito até agora para mitigar ou conter o incidente? (Se alguma senha foi alterada, sistemas desativados, etc.). *obrigatória"
-              type="text"
+              type="textarea"
               name="mitigacao"
               placeholder="Descreva as ações de mitigação"
               required
             />
             <FormField
               label="Possível causa do incidente: Se o denunciante souber, pode tentar identificar se foi falha humana, falha técnica ou ataque cibernético. *obrigatória"
-              type="text"
+              type="textarea"
               name="causa"
               placeholder="Descreva a possível causa"
               required
@@ -90,7 +82,12 @@ const Formulario = () => {
               placeholder="Confirme as informações"
               required
             />
-            <input type="submit" value="Enviar" />
+            <FormField
+              label="Existem evidências ou logs relacionados ao incidente? (anexar se possível)."
+              type="file"
+              name="evidencias"
+            />
+            <input type="submit"></input>
           </form>
         </div>
       </section>
