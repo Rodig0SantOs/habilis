@@ -46,17 +46,26 @@ const Header = () => {
         <nav>
           <ul>
             <li>
-              <a href="/">
+              <a
+                href="https://www.instagram.com/habilis.sistemas/"
+                target="_blank"
+              >
                 <FaInstagram />
               </a>
             </li>
             <li>
-              <a href="/">
+              <a
+                href="https://www.facebook.com/people/Habilis-Sistemas/61559838983322/"
+                target="_blank"
+              >
                 <FaFacebook />
               </a>
             </li>
             <li>
-              <a href="/">
+              <a
+                href="https://wa.me/+5538988690384?text=Bem-vindo%20ao%20canal%20de%20denuncias%20relacionadas%20a%20Habilis"
+                target="_blank"
+              >
                 <FaWhatsapp />
               </a>
             </li>

@@ -11,29 +11,23 @@ const Formulario = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData(formRef.current);
-    const data = Object.fromEntries(formData.entries());
-
     try {
-      const response = await fetch("http://localhost:5173/enviar-formulario", {
+      const formData = new FormData(formRef.current);
+      const response = await fetch("http://localhost:3000/formulario", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+        body: formData, // Envie o FormData diretamente
       });
 
       if (response.ok) {
         alert("Formulário enviado com sucesso!");
         formRef.current.reset();
       } else {
-        throw new Error("Erro ao enviar formulário");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Erro ao enviar formulário");
       }
     } catch (error) {
       console.error("Erro:", error);
-      alert(
-        "Ocorreu um erro ao enviar o formulário. Por favor, tente novamente."
-      );
+      alert(error.message || "Ocorreu um erro ao enviar o formulário");
     }
   };
 
