@@ -1,6 +1,4 @@
 import React, { useRef } from "react";
-
-/* Css module */
 import style from "./Formulario.module.css";
 import FormField from "../utils/form";
 import Footer from "../components/Footer/Footer";
@@ -10,25 +8,6 @@ const Formulario = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      const formData = new FormData(formRef.current);
-      const response = await fetch("http://localhost:3000/formulario", {
-        method: "POST",
-        body: formData, // Envie o FormData diretamente
-      });
-
-      if (response.ok) {
-        alert("Formulário enviado com sucesso!");
-        formRef.current.reset();
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Erro ao enviar formulário");
-      }
-    } catch (error) {
-      console.error("Erro:", error);
-      alert(error.message || "Ocorreu um erro ao enviar o formulário");
-    }
   };
 
   return (
