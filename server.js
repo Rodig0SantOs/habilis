@@ -1,14 +1,37 @@
 /* eslint-disable no-undef */
-require("dotenv").config(); // Carrega as variáveis do .env
+import dotenv from "dotenv"; // Carrega as variáveis do .env
 import express from "express";
 import nodemailer from "nodemailer";
 import cors from "cors";
 import bodyParser from "body-parser";
 
+dotenv.config();
 const app = express();
 const port = 5000;
 
-app.use(cors());
+/* Cors de Desenvolvimento */
+/* app.use(cors()); */
+
+/* Cors de Produção */
+/* app.use(
+  cors({
+    origin: "https://stwdashboard.vercel.app",
+  })
+); */
+// Em produção
+const allowedOrigins = ["https://habilis-zeta.vercel.app/"];
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+  })
+);
+
 app.use(bodyParser.json());
 
 // Configuração do transportador do Nodemailer

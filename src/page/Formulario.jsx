@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 import React, { useRef, useState } from "react";
-import axios from "axios";
 import style from "./Formulario.module.css";
 import FormField from "../utils/form";
 import Footer from "../components/Footer/Footer";
@@ -8,36 +7,96 @@ import Footer from "../components/Footer/Footer";
 const Formulario = () => {
   const formRef = useRef(null);
   const [formStatus, setFormStatus] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const formData = new FormData(formRef.current);
-
-    const data = {
-      nome: formData.get("nome"),
-      contato: formData.get("contato"),
-      data_hora: formData.get("data_hora"),
-      descricao: formData.get("descricao"),
-      ativos: formData.get("ativos"),
-      impacto: formData.get("impacto"),
-      mitigacao: formData.get("mitigacao"),
-      causa: formData.get("causa"),
-      anonimo: formData.get("anonimo"),
-      confirmacao: formData.get("confirmacao"),
-      evidencias: formData.get("evidencias"), // Aqui você pode pegar o arquivo ou link relacionado
-    };
+    setIsSubmitting(true);
+    setFormStatus(null);
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/send-email",
-        data
-      );
-      setFormStatus("E-mail enviado com sucesso!");
+      const formData = new FormData(formRef.current);
+      const fileInput = formRef.current.elements.evidencias;
+      let fileBase64 = null;
+
+      // Processar arquivo se existir
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        fileBase64 = await toBase64(file);
+      }
+
+      // Preparar dados para o email
+      const emailData = {
+        host_smtp: process.env.REACT_APP_SMTP_HOST,
+        usuario_smtp: process.env.REACT_APP_SMTP_USER,
+        senha_smtp: process.env.REACT_APP_SMTP_PASS,
+        emailRemetente: process.env.REACT_APP_SMTP_USER,
+        nomeRemetente: "Sistema de Denúncias",
+        emailDestino: ["rodrigo.santos@stwbrasil.com"], // Pode adicionar mais destinatários
+        assunto: `Nova Ocorrência Registrada - ${formData.get("data_hora")}`,
+        mensagem: `
+          <h1>Nova Ocorrência Registrada</h1>
+          <p><strong>Nome:</strong> ${formData.get("nome") || "Anônimo"}</p>
+          <p><strong>Contato:</strong> ${
+            formData.get("contato") || "Não informado"
+          }</p>
+          <p><strong>Data/Hora:</strong> ${formData.get("data_hora")}</p>
+          <p><strong>Descrição:</strong> ${formData.get("descricao")}</p>
+          <p><strong>Ativos Impactados:</strong> ${formData.get("ativos")}</p>
+          <p><strong>Impacto Operacional:</strong> ${formData.get(
+            "impacto"
+          )}</p>
+          <p><strong>Ações de Mitigação:</strong> ${formData.get(
+            "mitigacao"
+          )}</p>
+          <p><strong>Possível Causa:</strong> ${formData.get("causa")}</p>
+          <p><strong>Denúncia Anônima:</strong> ${formData.get("anonimo")}</p>
+        `,
+        mensagemTipo: "html",
+        mensagemEncoding: "utf-8",
+        mensagemAlt: `Nova ocorrência registrada em ${formData.get(
+          "data_hora"
+        )}. Verifique o email HTML para detalhes.`,
+      };
+
+      // Adicionar anexo se existir
+      if (fileBase64) {
+        emailData.mensagemAnexos = {
+          file1: {
+            name: fileInput.files[0].name,
+            type: fileInput.files[0].type,
+            content: fileBase64.split(",")[1], // Remove o prefixo data:...
+          },
+        };
+      }
+
+      // Enviar email
+      await sendEmail(emailData);
+
+      setFormStatus({
+        type: "success",
+        message: "Ocorrência registrada com sucesso!",
+      });
+      formRef.current.reset();
     } catch (error) {
-      setFormStatus("Erro ao enviar o e-mail. Tente novamente.");
+      console.error("Erro ao enviar formulário:", error);
+      setFormStatus({
+        type: "error",
+        message: "Erro ao enviar ocorrência. Por favor, tente novamente.",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  // Função para converter arquivo para base64
+  const toBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
 
   return (
     <section className={style.body}>
@@ -123,9 +182,19 @@ const Formulario = () => {
               type="file"
               name="evidencias"
             />
-            <input type="submit" value="Enviar"></input>
+            <button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Enviando..." : "Enviar"}
+            </button>
           </form>
-          {formStatus && <p>{formStatus}</p>}
+          {formStatus && (
+            <p
+              className={
+                formStatus.type === "success" ? style.success : style.error
+              }
+            >
+              {formStatus.message}
+            </p>
+          )}
         </div>
       </section>
       <Footer />
