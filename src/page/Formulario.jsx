@@ -1,8 +1,8 @@
-/* eslint-disable no-unused-vars */
 import React, { useRef, useState } from "react";
 import style from "./Formulario.module.css";
 import FormField from "../utils/form";
 import Footer from "../components/Footer/Footer";
+import sendEmail from "../services/emailService"; // Importando a função de envio de e-mail
 
 const Formulario = () => {
   const formRef = useRef(null);
@@ -11,6 +11,53 @@ const Formulario = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const formData = new FormData(formRef.current);
+      const data = Object.fromEntries(formData.entries());
+
+      // Processar anexos
+      const anexos = {};
+      const files = formRef.current.evidencias.files;
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const base64Content = await convertFileToBase64(file);
+
+        anexos[`file${i + 1}`] = {
+          name: file.name,
+          type: file.type,
+          content: base64Content.split(",")[1], // Remove o prefixo data:*/*
+        };
+      }
+
+      await sendEmail(data, files.length > 0 ? anexos : {});
+
+      setFormStatus({
+        type: "success",
+        message: "Formulário enviado com sucesso!",
+      });
+      formRef.current.reset();
+    } catch (error) {
+      console.error("Erro ao enviar formulário:", error);
+      setFormStatus({
+        type: "error",
+        message: "Erro ao enviar formulário. Por favor, tente novamente.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Função para converter arquivo para base64
+  const convertFileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
   };
 
   return (
