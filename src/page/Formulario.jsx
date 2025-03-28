@@ -1,10 +1,15 @@
-/* eslint-disable no-undef */
 import React, { useRef, useState } from "react";
 import style from "./Formulario.module.css";
 import FormField from "../utils/form";
 import Footer from "../components/Footer/Footer";
 
 const Formulario = () => {
+  const SMTP_HOST = import.meta.env.VITE_SMTP_HOST;
+  const SMTP_USER = import.meta.env.VITE_SMTP_USER;
+  const SMTP_PASS = import.meta.env.VITE_SMTP_PASS;
+  const API_URL = import.meta.env.VITE_API_URL;
+  const SMTP_TOKEN = import.meta.env.VITE_SMTP_TOKEN;
+
   const formRef = useRef(null);
   const [formStatus, setFormStatus] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,87 +21,176 @@ const Formulario = () => {
 
     try {
       const formData = new FormData(formRef.current);
-      const fileInput = formRef.current.elements.evidencias;
-      let fileBase64 = null;
+      const formValues = Object.fromEntries(formData.entries());
 
-      // Processar arquivo se existir
-      if (fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        fileBase64 = await toBase64(file);
+      let anexosBase64 = {};
+      if (formValues.evidencias && formValues.evidencias.size > 0) {
+        anexosBase64 = await processarAnexos(formValues.evidencias);
       }
 
-      // Preparar dados para o email
       const emailData = {
-        host_smtp: process.env.REACT_APP_SMTP_HOST,
-        usuario_smtp: process.env.REACT_APP_SMTP_USER,
-        senha_smtp: process.env.REACT_APP_SMTP_PASS,
-        emailRemetente: process.env.REACT_APP_SMTP_USER,
-        nomeRemetente: "Sistema de Denúncias",
-        emailDestino: ["rodrigo.santos@stwbrasil.com"], // Pode adicionar mais destinatários
-        assunto: `Nova Ocorrência Registrada - ${formData.get("data_hora")}`,
-        mensagem: `
-          <h1>Nova Ocorrência Registrada</h1>
-          <p><strong>Nome:</strong> ${formData.get("nome") || "Anônimo"}</p>
-          <p><strong>Contato:</strong> ${
-            formData.get("contato") || "Não informado"
-          }</p>
-          <p><strong>Data/Hora:</strong> ${formData.get("data_hora")}</p>
-          <p><strong>Descrição:</strong> ${formData.get("descricao")}</p>
-          <p><strong>Ativos Impactados:</strong> ${formData.get("ativos")}</p>
-          <p><strong>Impacto Operacional:</strong> ${formData.get(
-            "impacto"
-          )}</p>
-          <p><strong>Ações de Mitigação:</strong> ${formData.get(
-            "mitigacao"
-          )}</p>
-          <p><strong>Possível Causa:</strong> ${formData.get("causa")}</p>
-          <p><strong>Denúncia Anônima:</strong> ${formData.get("anonimo")}</p>
-        `,
+        host_smtp: SMTP_HOST,
+        usuario_smtp: SMTP_USER,
+        senha_smtp: SMTP_PASS,
+        emailRemetente: SMTP_USER,
+        nomeRemetente: "Sistema de Denúncias STW Brasil",
+        emailDestino: ["stwbrasil@stwbrasil.com"],
+        assunto: `Nova Ocorrência Registrada - ${formValues.data_hora}`,
+        mensagem: construirMensagemHTML(formValues),
         mensagemTipo: "html",
-        mensagemEncoding: "utf-8",
-        mensagemAlt: `Nova ocorrência registrada em ${formData.get(
-          "data_hora"
-        )}. Verifique o email HTML para detalhes.`,
+        mensagemEncoding: "base64",
+        mensagemAlt: construirMensagemTexto(formValues),
       };
 
-      // Adicionar anexo se existir
-      if (fileBase64) {
-        emailData.mensagemAnexos = {
-          file1: {
-            name: fileInput.files[0].name,
-            type: fileInput.files[0].type,
-            content: fileBase64.split(",")[1], // Remove o prefixo data:...
-          },
-        };
+      if (Object.keys(anexosBase64).length > 0) {
+        emailData.mensagemAnexos = anexosBase64;
       }
 
-      // Enviar email
-      await sendEmail(emailData);
-
-      setFormStatus({
-        type: "success",
-        message: "Ocorrência registrada com sucesso!",
+      const response = await fetch("/api/send", {
+        // Note a ausência da barra no final
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${SMTP_TOKEN}`,
+        },
+        body: JSON.stringify(emailData),
       });
-      formRef.current.reset();
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `HTTP error! status: ${response.status} - ${errorText}`
+        );
+      }
+
+      const result = await response.json();
+
+      if (result.status === "MSG ENVIADA") {
+        setFormStatus({
+          type: "success",
+          message: "Ocorrência registrada com sucesso!",
+        });
+        formRef.current.reset();
+      } else {
+        throw new Error(result.status || "Erro ao enviar o email");
+      }
     } catch (error) {
-      console.error("Erro ao enviar formulário:", error);
+      console.error("Erro detalhado:", error);
       setFormStatus({
         type: "error",
-        message: "Erro ao enviar ocorrência. Por favor, tente novamente.",
+        message: error.message.includes("Failed to fetch")
+          ? "Falha na conexão com o servidor. Verifique sua internet."
+          : error.message.includes("HTTP error")
+          ? `Erro do servidor: ${error.message}`
+          : "Falha ao registrar ocorrência. Por favor, tente novamente.",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Função para converter arquivo para base64
-  const toBase64 = (file) =>
-    new Promise((resolve, reject) => {
+  // Função para processar anexos em Base64
+  const processarAnexos = async (arquivos) => {
+    const anexos = {};
+
+    // Converter FileList para array para facilitar iteração
+    const arquivosArray = Array.from(arquivos);
+
+    for (let i = 0; i < arquivosArray.length; i++) {
+      const arquivo = arquivosArray[i];
+      const base64 = await converterParaBase64(arquivo);
+      anexos[`file${i + 1}`] = {
+        name: arquivo.name,
+        type: arquivo.type,
+        content: base64.split(",")[1], // Remove o prefixo data:...
+      };
+    }
+
+    return anexos;
+  };
+
+  // Converter arquivo para Base64
+  const converterParaBase64 = (file) => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => resolve(reader.result);
       reader.onerror = (error) => reject(error);
     });
+  };
+
+  // Construir mensagem HTML
+  const construirMensagemHTML = (dados) => {
+    return `
+      <html>
+        <body>
+          <h1>Nova Ocorrência Registrada</h1>
+          <p><strong>Data/Hora:</strong> ${dados.data_hora}</p>
+          ${
+            dados.nome
+              ? `<p><strong>Denunciante:</strong> ${dados.nome}</p>`
+              : "<p><strong>Denúncia anônima</strong></p>"
+          }
+          ${
+            dados.contato
+              ? `<p><strong>Contato:</strong> ${dados.contato}</p>`
+              : ""
+          }
+          <h2>Detalhes do Incidente</h2>
+          <p>${dados.descricao.replace(/\n/g, "<br>")}</p>
+          <h3>Ativos Impactados</h3>
+          <p>${dados.ativos}</p>
+          <h3>Impacto Operacional</h3>
+          <p>${dados.impacto.replace(/\n/g, "<br>")}</p>
+          <h3>Ações de Mitigação</h3>
+          <p>${dados.mitigacao.replace(/\n/g, "<br>")}</p>
+          <h3>Possível Causa</h3>
+          <p>${dados.causa.replace(/\n/g, "<br>")}</p>
+          <p><strong>Denúncia anônima:</strong> ${
+            dados.anonimo === "sim" ? "Sim" : "Não"
+          }</p>
+          <p><strong>Confirma veracidade:</strong> ${
+            dados.confirmacao === "sim" ? "Sim" : "Não"
+          }</p>
+          ${
+            Object.keys(dados.evidencias || {}).length > 0
+              ? "<p><strong>Anexos:</strong> Sim</p>"
+              : ""
+          }
+        </body>
+      </html>
+    `;
+  };
+
+  // Construir mensagem em texto simples
+  const construirMensagemTexto = (dados) => {
+    return `
+Nova Ocorrência Registrada
+
+Data/Hora: ${dados.data_hora}
+${dados.nome ? `Denunciante: ${dados.nome}` : "Denúncia anônima"}
+${dados.contato ? `Contato: ${dados.contato}` : ""}
+
+Detalhes do Incidente:
+${dados.descricao}
+
+Ativos Impactados:
+${dados.ativos}
+
+Impacto Operacional:
+${dados.impacto}
+
+Ações de Mitigação:
+${dados.mitigacao}
+
+Possível Causa:
+${dados.causa}
+
+Denúncia anônima: ${dados.anonimo === "sim" ? "Sim" : "Não"}
+Confirma veracidade: ${dados.confirmacao === "sim" ? "Sim" : "Não"}
+${Object.keys(dados.evidencias || {}).length > 0 ? "Anexos: Sim" : ""}
+    `;
+  };
 
   return (
     <section className={style.body}>
@@ -181,6 +275,7 @@ const Formulario = () => {
               label="Existem evidências ou logs relacionados ao incidente? (anexar se possível)."
               type="file"
               name="evidencias"
+              multiple // Permite múltiplos arquivos
             />
             <button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Enviando..." : "Enviar"}
