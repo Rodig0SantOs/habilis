@@ -8,7 +8,7 @@ export const sendEmail = async (formData) => {
   try {
     await initEmailJS();
 
-    // Verifica se existem anexos e formata
+    /* // Verifica se existem anexos e formata
     let anexosFormatados = "Nenhum anexo";
     if (formData.anexo && formData.anexo.length > 0) {
       anexosFormatados = formData.anexo
@@ -23,11 +23,13 @@ export const sendEmail = async (formData) => {
         ...formData,
         anexo: anexosFormatados,
       } // Excluindo o campo de anexos para não enviar no log
-    );
+    ); */
 
     const templateParams = {
-      from_name: formData.nome || "Anônimo",
+      from_name: formData.nome || "Sistema de Ocorrências",
+      subject: `Registro de Ocorrência - ${formData.nome || "Anônimo"}`,
       email: formData.email || "Não informado",
+      reply_to: formData.email || "",
       incident_date: formData.data_hora || "Não informado",
       description: formData.descricao || "Não informado",
       assets: formData.ativos || "Não informado",
@@ -36,8 +38,7 @@ export const sendEmail = async (formData) => {
       cause: formData.causa || "Não informado",
       anonymous: formData.anonimo || "Não informado",
       confirmation: formData.confirmacao || "Não informado",
-      anexo: anexosFormatados,
-      message: "",
+      /* anexo: anexosFormatados, */
     };
 
     const serviceID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
@@ -47,6 +48,6 @@ export const sendEmail = async (formData) => {
     return response;
   } catch (error) {
     console.error("Erro detalhado no envio:", error);
-    throw new Error("Falha ao enviar e-mail: " + error.message);
+    throw new Error("Falha ao enviar e-mail: ", error.message);
   }
 };
