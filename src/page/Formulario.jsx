@@ -181,12 +181,12 @@ const Formulario = () => {
               ]}
               required
             />
-            <FormField
+            {/* <FormField
               label="Existem evidências ou logs relacionados ao incidente? (anexar se possível)."
               type="file"
               name="anexo" // Este nome deve ser consistente em todos os lugares
               multiple
-            />
+            /> */}
             <button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Enviando..." : "Enviar"}
             </button>

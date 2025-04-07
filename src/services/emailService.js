@@ -12,16 +12,25 @@ export const sendEmail = async (formData) => {
     let anexosFormatados = "Nenhum anexo";
     if (formData.anexo && formData.anexo.length > 0) {
       anexosFormatados = formData.anexo
-        .map(anexo => `• ${anexo.name}: ${anexo.url}`)
+        .map((anexo) => `${anexo.name}: ${anexo.url}`)
         .join("\n");
     }
+
+    console.log("Anexos formatados:", anexosFormatados);
+    console.log(
+      "Dados do formulário antes do envio:",
+      {
+        ...formData,
+        anexo: anexosFormatados,
+      } // Excluindo o campo de anexos para não enviar no log
+    );
 
     const templateParams = {
       from_name: formData.nome || "Anônimo",
       email: formData.email || "Não informado",
-      subject: "Registro de Ocorrência",
       incident_date: formData.data_hora || "Não informado",
       description: formData.descricao || "Não informado",
+      assets: formData.ativos || "Não informado",
       impact: formData.impacto || "Não informado",
       mitigation: formData.mitigacao || "Não informado",
       cause: formData.causa || "Não informado",
