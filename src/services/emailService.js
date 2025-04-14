@@ -1,9 +1,6 @@
 // emailService.js
 import emailjs from "@emailjs/browser";
 
-// Inicializa assim que o arquivo é carregado
-emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
-
 export const sendEmail = async (formData) => {
   try {
     console.log("Public Key:", import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
@@ -29,7 +26,12 @@ export const sendEmail = async (formData) => {
     const serviceID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
     const templateID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
 
-    const response = await emailjs.send(serviceID, templateID, templateParams);
+    const response = await emailjs.send(
+      serviceID,
+      templateID,
+      templateParams,
+      import.meta.env.VITE_EMAILJS_PUBLIC_KEY // adicione isso!
+    );
     return response;
   } catch (error) {
     console.error("Erro detalhado no envio:", error);
