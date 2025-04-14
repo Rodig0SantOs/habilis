@@ -1,29 +1,14 @@
+// emailService.js
 import emailjs from "@emailjs/browser";
 
-export const initEmailJS = () => {
-  emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
-};
+// Inicializa assim que o arquivo é carregado
+emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
 
 export const sendEmail = async (formData) => {
   try {
-    await initEmailJS();
-
-    /* // Verifica se existem anexos e formata
-    let anexosFormatados = "Nenhum anexo";
-    if (formData.anexo && formData.anexo.length > 0) {
-      anexosFormatados = formData.anexo
-        .map((anexo) => `${anexo.name}: ${anexo.url}`)
-        .join("\n");
-    }
-
-    console.log("Anexos formatados:", anexosFormatados);
-    console.log(
-      "Dados do formulário antes do envio:",
-      {
-        ...formData,
-        anexo: anexosFormatados,
-      } // Excluindo o campo de anexos para não enviar no log
-    ); */
+    console.log("Public Key:", import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+    console.log("Service ID:", import.meta.env.VITE_EMAILJS_SERVICE_ID);
+    console.log("Template ID:", import.meta.env.VITE_EMAILJS_TEMPLATE_ID);
 
     const templateParams = {
       from_name: formData.nome || "Sistema de Ocorrências",
