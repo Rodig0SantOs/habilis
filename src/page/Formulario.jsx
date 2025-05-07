@@ -26,7 +26,6 @@ const Formulario = () => {
       const emailOuTelefone = formData.get("email") || "";
       const isEmail = emailOuTelefone.includes("@");
 
-      // Mapear os dados do formulário para o formato esperado pela API
       const opportunityData = {
         queueId: 0,
         apiKey: "string", // <-- substitua com seu valor real
@@ -39,7 +38,7 @@ const Formulario = () => {
         clientid: "string", // <-- substitua com seu identificador de cliente
         mainphone: isEmail ? "" : emailOuTelefone,
         mainmail: isEmail ? emailOuTelefone : "",
-        description: formData.get("descricao"),
+        description: "Ocorrência registrada via formulário",
         expectedclosedate: new Date(
           Date.now() + 7 * 24 * 60 * 60 * 1000
         ).toISOString(),
@@ -60,6 +59,7 @@ const Formulario = () => {
         formsdata: {
           nome,
           data_hora: formData.get("data_hora"),
+          descricao: formData.get("descricao"),
           ativos: formData.get("ativos"),
           impacto: formData.get("impacto"),
           mitigacao: formData.get("mitigacao"),
@@ -80,17 +80,8 @@ const Formulario = () => {
         ],
       };
 
-      console.log("Data enviado", opportunityData);
+      console.log("Payload final:", opportunityData);
 
-      // Processar anexos se existirem
-      const files = formData.getAll("anexo");
-      const validFiles = Array.from(files).filter((file) => file.size > 0);
-
-      // Logs de debug
-      console.log("Enviando dados da oportunidade:", opportunityData);
-      console.log("Arquivos válidos:", validFiles);
-
-      // Enviar a requisição para a API
       const response = await fetch(
         "https://suportehabilis.atenderbem.com/int/createOpportunity",
         {
@@ -103,14 +94,14 @@ const Formulario = () => {
         }
       );
 
-      console.log("Resposta bruta da API:", response);
-
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Erro detalhado:", errorText);
         throw new Error(`Erro HTTP: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log("Resposta processada da API:", data);
+      console.log("Resposta da API:", data);
 
       setFormStatus({
         type: "success",
