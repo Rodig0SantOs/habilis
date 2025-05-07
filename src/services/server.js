@@ -37,7 +37,7 @@ app.post('/api/report-incident', async (req, res) => {
     };
 
     const response = await axios.post(
-      'https://suportehabilis.atenderbem.com/int/createOpportunity',
+      'https://suportehabilis.atenderbem.com/webhookcapture/capture/186216716d1c4b25b8d93ddfd6e894f6 ',
       opportunityData,
       {
         headers: { 'Content-Type': 'application/json' }
