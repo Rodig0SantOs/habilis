@@ -4,6 +4,8 @@ import style from "./Formulario.module.css";
 import FormField from "../utils/form";
 import Footer from "../components/Footer/Footer";
 
+const API_KEY = import.meta.env.VITE_PUBLIC_APIKEY;
+
 const Formulario = () => {
   const formRef = useRef(null);
   const [formStatus, setFormStatus] = useState(null);
@@ -30,7 +32,7 @@ const Formulario = () => {
       // Dados principais
       const opportunityData = {
         queueId: 0,
-        apiKey: "string",
+        apiKey: API_KEY,
         fkPipeline: 0,
         fkStage: 0,
         responsableid: 0,
