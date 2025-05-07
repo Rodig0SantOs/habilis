@@ -3,11 +3,13 @@ import style from "./Formulario.module.css";
 import FormField from "../utils/form";
 import Footer from "../components/Footer/Footer";
 import { sendOpportunityData } from "../services/apiService";
+import { useNavigate } from "react-router";
 
 const Formulario = () => {
   const formRef = useRef(null);
   const [formStatus, setFormStatus] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -93,6 +95,10 @@ const Formulario = () => {
       });
 
       formRef.current.reset();
+
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
     } catch (error) {
       console.error("Erro no envio:", error);
       setFormStatus({
@@ -202,13 +208,14 @@ const Formulario = () => {
             </button>
           </form>
           {formStatus && (
-            <p
-              className={
+            <div
+              className={`${style.alert} ${
                 formStatus.type === "success" ? style.success : style.error
-              }
+              }`}
+              role="alert"
             >
               {formStatus.message}
-            </p>
+            </div>
           )}
         </div>
       </section>
