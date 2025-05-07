@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import style from "./Formulario.module.css";
 import FormField from "../utils/form";
 import Footer from "../components/Footer/Footer";
+import { sendOpportunityData } from "../services/apiService";
 
 const Formulario = () => {
   const formRef = useRef(null);
@@ -28,14 +29,14 @@ const Formulario = () => {
       // Dados principais
       const opportunityData = {
         queueId: 0,
-        apiKey: "não especificado", // Substitua por sua chave real
+        apiKey: "não especificado",
         fkPipeline: 0,
         fkStage: 0,
         responsableid: 0,
         title: `Ocorrência: ${
           formData.get("descricao")?.substring(0, 50) || "não especificado"
         }`,
-        clientid: "não especificado", // Substitua pelo seu clientid
+        clientid: "não especificado",
         mainphone: isEmail ? "não especificado" : emailOuTelefone,
         mainmail: isEmail ? emailOuTelefone : "0",
         description: formData.get("descricao"),
@@ -67,13 +68,13 @@ const Formulario = () => {
           anonimo: formData.get("anonimo"),
           confirmacao: formData.get("confirmacao"),
         },
-        tags: [0], // A lista de tags pode estar vazia ou com IDs válidos
-        files: [], // Envie arquivos, se houver
-        contacts: [0], // IDs dos contatos, se necessário
-        followers: [0], // IDs dos seguidores, se necessário
+        tags: [0],
+        files: [],
+        contacts: [0],
+        followers: [0],
         products: [
           {
-            id: 0, // Substitua com dados reais do produto, se aplicável
+            id: 0,
             qty: 0,
             discount: 0,
           },
@@ -82,39 +83,8 @@ const Formulario = () => {
 
       console.log("Payload final:", opportunityData);
 
-      const response = await fetch(
-        "https://suportehabilis.atenderbem.com/webhookcapture/capture/186216716d1c4b25b8d93ddfd6e894f6",
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(opportunityData),
-        }
-      );
-
-      // Verificar primeiro se a resposta é OK
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Erro detalhado:", errorText);
-        throw new Error(`Erro HTTP: ${response.status} - ${errorText}`);
-      }
-
-      // Tentar parsear a resposta como JSON
-      const responseText = await response.text();
-      let data = {};
-
-      if (responseText) {
-        try {
-          data = JSON.parse(responseText);
-        } catch (parseError) {
-          console.warn(
-            "A resposta não é JSON válido, mas a requisição foi bem-sucedida"
-          );
-        }
-      }
-
+      // Chamada ao serviço de API
+      const data = await sendOpportunityData(opportunityData);
       console.log("Resposta da API:", data);
 
       setFormStatus({
