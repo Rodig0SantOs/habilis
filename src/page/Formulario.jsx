@@ -32,38 +32,52 @@ const Formulario = () => {
       // Dados principais
       const opportunityData = {
         queueId: 0,
-        apiKey: API_KEY,
+        apiKey: API_KEY, // Substitua por sua chave real
         fkPipeline: 0,
         fkStage: 0,
         responsableid: 0,
-        title: "string",
-        clientid: "string",
-        mainphone: "string",
-        mainmail: "string",
-        description: "string",
-        expectedclosedate: "string",
-        formattedlocation: "string",
-        postalcode: "string",
-        address1: "string",
-        address2: "string",
-        city: "string",
-        state: "string",
-        country: "string",
-        countrycode: "string",
+        title: `Ocorrência: ${
+          formData.get("descricao")?.substring(0, 50) || "não especificado"
+        }`,
+        clientid: "não especificado", // Substitua pelo seu clientid
+        mainphone: isEmail ? "não especificado" : emailOuTelefone,
+        mainmail: isEmail ? emailOuTelefone : "0",
+        description: formData.get("descricao"),
+        expectedclosedate: new Date(
+          Date.now() + 7 * 24 * 60 * 60 * 1000
+        ).toISOString(),
+        formattedlocation: "Local não especificado",
+        postalcode: formData.get("cep") || "não especificado",
+        address1: formData.get("endereco1") || "não especificado",
+        address2: formData.get("endereco2") || "não especificado",
+        city: formData.get("cidade") || "não especificado",
+        state: formData.get("estado") || "não especificado",
+        country: formData.get("pais") || "não especificado",
+        countrycode: formData.get("codigoPais") || "não especificado",
         lat: 0,
         lon: 0,
         probability: 0,
         value: 0,
         recurrentvalue: 0,
         origin: 0,
-        formsdata: {},
-        tags: [0],
-        files: [0],
-        contacts: [0],
-        followers: [0],
+        formsdata: {
+          nome,
+          data_hora: formData.get("data_hora"),
+          descricao: formData.get("descricao"),
+          ativos: formData.get("ativos"),
+          impacto: formData.get("impacto"),
+          mitigacao: formData.get("mitigacao"),
+          causa: formData.get("causa"),
+          anonimo: formData.get("anonimo"),
+          confirmacao: formData.get("confirmacao"),
+        },
+        tags: [0], // A lista de tags pode estar vazia ou com IDs válidos
+        files: [], // Envie arquivos, se houver
+        contacts: [0], // IDs dos contatos, se necessário
+        followers: [0], // IDs dos seguidores, se necessário
         products: [
           {
-            id: 0,
+            id: 0, // Substitua com dados reais do produto, se aplicável
             qty: 0,
             discount: 0,
           },
