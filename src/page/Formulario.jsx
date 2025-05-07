@@ -21,7 +21,6 @@ const Formulario = () => {
 
     try {
       const formData = new FormData(formRef.current);
-
       const nome = formData.get("nome") || "Anônimo";
       const emailOuTelefone = formData.get("email") || "";
       const isEmail = emailOuTelefone.includes("@");
@@ -88,22 +87,34 @@ const Formulario = () => {
         {
           method: "POST",
           headers: {
-            accept: "application/json",
+            Accept: "application/json",
             "Content-Type": "application/json",
           },
           body: JSON.stringify(opportunityData),
         }
       );
 
-      console.log("Resposta JSON", response);
-
+      // Verificar primeiro se a resposta é OK
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Erro detalhado:", errorText);
-        throw new Error(`Erro HTTP: ${response.status}`);
+        throw new Error(`Erro HTTP: ${response.status} - ${errorText}`);
       }
 
-      const data = await response.json();
+      // Tentar parsear a resposta como JSON
+      const responseText = await response.text();
+      let data = {};
+
+      if (responseText) {
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          console.warn(
+            "A resposta não é JSON válido, mas a requisição foi bem-sucedida"
+          );
+        }
+      }
+
       console.log("Resposta da API:", data);
 
       setFormStatus({
