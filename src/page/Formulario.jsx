@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useRef, useState } from "react";
 import style from "./Formulario.module.css";
 import FormField from "../utils/form";
@@ -30,10 +29,16 @@ const Formulario = () => {
         fkPipeline: 1, // Defina conforme necessário
         fkStage: 1, // Defina conforme necessário
         responsableid: 1, // Defina o ID do responsável
-        title: `Ocorrência: ${formData.get("descricao")?.substring(0, 50) || "Sem título"}`, // Título baseado na descrição
+        title: `Ocorrência: ${
+          formData.get("descricao")?.substring(0, 50) || "Sem título"
+        }`, // Título baseado na descrição
         clientid: "identificador-cliente", // Defina conforme necessário
-        mainphone: formData.get("email")?.includes("@") ? "" : formData.get("email") || "", // Assume que pode ser telefone
-        mainmail: formData.get("email")?.includes("@") ? formData.get("email") : "", // Email se for válido
+        mainphone: formData.get("email")?.includes("@")
+          ? ""
+          : formData.get("email") || "", // Assume que pode ser telefone
+        mainmail: formData.get("email")?.includes("@")
+          ? formData.get("email")
+          : "", // Email se for válido
         description: `Detalhes da ocorrência:
           Nome: ${formData.get("nome") || "Anônimo"}
           Data/Hora: ${formData.get("data_hora")}
@@ -42,7 +47,9 @@ const Formulario = () => {
           Impacto: ${formData.get("impacto")}
           Mitigação: ${formData.get("mitigacao")}
           Causa: ${formData.get("causa")}`,
-        expectedclosedate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // Data de fechamento esperada em 7 dias
+        expectedclosedate: new Date(
+          Date.now() + 7 * 24 * 60 * 60 * 1000
+        ).toISOString(), // Data de fechamento esperada em 7 dias
         formattedlocation: "Local não especificado", // Pode ser ajustado
         postalcode: "",
         address1: "",
@@ -59,35 +66,45 @@ const Formulario = () => {
         origin: 1, // Origem do lead/oportunidade
         formsdata: {
           anonimo: formData.get("anonimo"),
-          confirmacao: formData.get("confirmacao")
+          confirmacao: formData.get("confirmacao"),
         },
         tags: [1], // IDs de tags, ajuste conforme necessário
         files: [], // Será preenchido se houver anexos
         contacts: [],
         followers: [],
-        products: []
+        products: [],
       };
 
       // Processar anexos se existirem
       const files = formData.getAll("anexo");
-      const validFiles = Array.from(files).filter(file => file.size > 0);
+      const validFiles = Array.from(files).filter((file) => file.size > 0);
+
+      // Logs de debug
+      console.log("Enviando dados da oportunidade:", opportunityData);
+      console.log("Arquivos válidos:", validFiles);
 
       // Enviar a requisição para a API
-      const response = await fetch('https://suportehabilis.atenderbem.com/int/createOpportunity', {
-        method: 'POST',
-        headers: {
-          'accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(opportunityData)
-      });
+      const response = await fetch(
+        "https://suportehabilis.atenderbem.com/int/createOpportunity",
+        {
+          method: "POST",
+          headers: {
+            accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(opportunityData),
+        }
+      );
+
+      console.log("Resposta bruta da API:", response);
 
       if (!response.ok) {
         throw new Error(`Erro HTTP: ${response.status}`);
       }
 
       const data = await response.json();
-      
+      console.log("Resposta processada da API:", data);
+
       setFormStatus({
         type: "success",
         message: "Ocorrência registrada com sucesso no sistema!",
