@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import style from "./Formulario.module.css";
 import FormField from "../utils/form";
 import Footer from "../components/Footer/Footer";
@@ -12,29 +12,6 @@ const Formulario = () => {
 
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
   const MAX_TOTAL_SIZE = 20 * 1024 * 1024; // 20MB total
-
-  // Manipulação de Formulario vindo do RD Station
-  useEffect(() => {
-    // Carrega o script do RDStationForms dinamicamente
-    const script = document.createElement("script");
-    script.src =
-      "https://d335luupugsy2.cloudfront.net/js/rdstation-forms/stable/rdstation-forms.min.js";
-    script.async = true;
-    script.onload = () => {
-      if (window.RDStationForms) {
-        new window.RDStationForms(
-          "pagina-de-contato-e9ced31df1ed64d03a1f",
-          "UA-211547503-1"
-        ).createForm();
-      }
-    };
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-  // Final da Manipulação do formulario
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -121,7 +98,7 @@ const Formulario = () => {
       <section className={style.container}>
         <div className={style.containerBlock}>
           <h1>Registro de Ocorrência</h1>
-          <div role="main" id="pagina-de-contato-e9ced31df1ed64d03a1f"></div>
+
           <form
             ref={formRef}
             onSubmit={handleSubmit}
