@@ -98,7 +98,7 @@ const Formulario = () => {
 
       setTimeout(() => {
         navigate("/");
-      }, 3000);
+      }, 5000);
     } catch (error) {
       console.error("Erro no envio:", error);
       setFormStatus({
