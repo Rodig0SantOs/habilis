@@ -29,28 +29,28 @@ const Formulario = () => {
       // Dados principais
       const opportunityData = {
         queueId: 0,
-        apiKey: "string", // Substitua por sua chave real
+        apiKey: "não especificado", // Substitua por sua chave real
         fkPipeline: 0,
         fkStage: 0,
         responsableid: 0,
         title: `Ocorrência: ${
-          formData.get("descricao")?.substring(0, 50) || "Sem título"
+          formData.get("descricao")?.substring(0, 50) || "não especificado"
         }`,
-        clientid: "string", // Substitua pelo seu clientid
-        mainphone: isEmail ? "00000-0000" : emailOuTelefone,
+        clientid: "não especificado", // Substitua pelo seu clientid
+        mainphone: isEmail ? "não especificado" : emailOuTelefone,
         mainmail: isEmail ? emailOuTelefone : "0",
         description: "Ocorrência registrada via formulário",
         expectedclosedate: new Date(
           Date.now() + 7 * 24 * 60 * 60 * 1000
         ).toISOString(),
         formattedlocation: "Local não especificado",
-        postalcode: formData.get("cep") || "00000-000",
-        address1: formData.get("endereco1") || "string",
-        address2: formData.get("endereco2") || "string",
-        city: formData.get("cidade") || "string",
-        state: formData.get("estado") || "string",
-        country: formData.get("pais") || "string",
-        countrycode: formData.get("codigoPais") || "string",
+        postalcode: formData.get("cep") || "não especificado",
+        address1: formData.get("endereco1") || "não especificado",
+        address2: formData.get("endereco2") || "não especificado",
+        city: formData.get("cidade") || "não especificado",
+        state: formData.get("estado") || "não especificado",
+        country: formData.get("pais") || "não especificado",
+        countrycode: formData.get("codigoPais") || "não especificado",
         lat: 0,
         lon: 0,
         probability: 0,
@@ -96,7 +96,6 @@ const Formulario = () => {
       );
 
       console.log("Resposta JSON", response);
-      
 
       if (!response.ok) {
         const errorText = await response.text();
