@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import style from "./Formulario.module.css";
 import FormField from "../utils/form";
 import Footer from "../components/Footer/Footer";
@@ -13,9 +13,33 @@ const Formulario = () => {
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
   const MAX_TOTAL_SIZE = 20 * 1024 * 1024; // 20MB total
 
+  // Manipulação de Formulario vindo do RD Station
+  useEffect(() => {
+    // Carrega o script do RDStationForms dinamicamente
+    const script = document.createElement("script");
+    script.src =
+      "https://d335luupugsy2.cloudfront.net/js/rdstation-forms/stable/rdstation-forms.min.js";
+    script.async = true;
+    script.onload = () => {
+      if (window.RDStationForms) {
+        new window.RDStationForms(
+          "pagina-de-contato-e9ced31df1ed64d03a1f",
+          "UA-211547503-1"
+        ).createForm();
+      }
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+  // Final da Manipulação do formulario
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setFormStatus(null);
 
     if (!formRef.current) {
       console.error("formRef.current está indefinido!");
@@ -45,17 +69,15 @@ const Formulario = () => {
       let totalSize = 0;
       const anexos = [];
 
+      // Filtrar apenas arquivos válidos (tamanho > 0 e existentes)
+      const validFiles = Array.from(files).filter((file) => file.size > 0);
+
       // Verificar tamanhos primeiro
-      for (let i = 0; i < files.length; i++) {
-        // Verifica se é um arquivo válido (tamanho > 0)
-        if (files[i].size > 0) {
-          if (files[i].size > MAX_FILE_SIZE) {
-            throw new Error(
-              `O arquivo ${files[i].name} excede o limite de 10MB`
-            );
-          }
-          totalSize += files[i].size;
+      for (const file of validFiles) {
+        if (file.size > MAX_FILE_SIZE) {
+          throw new Error(`O arquivo ${file.name} excede o limite de 10MB`);
         }
+        totalSize += file.size;
       }
 
       if (totalSize > MAX_TOTAL_SIZE) {
@@ -63,21 +85,18 @@ const Formulario = () => {
       }
 
       // Upload dos arquivos válidos para imgBB
-      for (let i = 0; i < files.length; i++) {
-        if (files[i].size > 0) {
-          // Verifica se é um arquivo válido
-          const uploadResult = await uploadFileToImgBB(files[i]);
-          anexos.push({
-            name: uploadResult.name,
-            url: uploadResult.url,
-          });
-        }
+      for (const file of validFiles) {
+        const uploadResult = await uploadFileToImgBB(file);
+        anexos.push({
+          name: file.name,
+          url: uploadResult.url,
+        });
       }
 
       // Enviar email com as URLs dos anexos
       await sendEmail({
         ...formValues,
-        anexo: anexos, // Passando o array de anexos
+        anexo: anexos,
       });
 
       setFormStatus({
@@ -102,18 +121,7 @@ const Formulario = () => {
       <section className={style.container}>
         <div className={style.containerBlock}>
           <h1>Registro de Ocorrência</h1>
-
-          <div role="main" id="led-20c14bba681c01b2641b"></div>
-          <script
-            type="text/javascript"
-            src="https://d335luupugsy2.cloudfront.net/js/rdstation-forms/stable/rdstation-forms.min.js"
-          ></script>
-          <script type="text/javascript">
-            {" "}
-            new RDStationForms('led-20c14bba681c01b2641b',
-            'UA-211547503-1').createForm();
-          </script>
-
+          <div role="main" id="pagina-de-contato-e9ced31df1ed64d03a1f"></div>
           <form
             ref={formRef}
             onSubmit={handleSubmit}
@@ -128,7 +136,7 @@ const Formulario = () => {
             />
             <FormField
               label="E-mail ou telefone de contato (para retorno, se necessário)."
-              type="text" // Isso está correto para aceitar tanto email quanto telefone
+              type="text"
               name="email"
               placeholder="Digite seu e-mail ou telefone"
             />
@@ -193,12 +201,13 @@ const Formulario = () => {
               ]}
               required
             />
-            {/* <FormField
+            <FormField
               label="Existem evidências ou logs relacionados ao incidente? (anexar se possível)."
               type="file"
-              name="anexo" // Este nome deve ser consistente em todos os lugares
+              name="anexo"
               multiple
-            /> */}
+              accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+            />
             <button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Enviando..." : "Enviar"}
             </button>
