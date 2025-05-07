@@ -102,6 +102,18 @@ const Formulario = () => {
       <section className={style.container}>
         <div className={style.containerBlock}>
           <h1>Registro de Ocorrência</h1>
+
+          <div role="main" id="led-20c14bba681c01b2641b"></div>
+          <script
+            type="text/javascript"
+            src="https://d335luupugsy2.cloudfront.net/js/rdstation-forms/stable/rdstation-forms.min.js"
+          ></script>
+          <script type="text/javascript">
+            {" "}
+            new RDStationForms('led-20c14bba681c01b2641b',
+            'UA-211547503-1').createForm();
+          </script>
+
           <form
             ref={formRef}
             onSubmit={handleSubmit}
