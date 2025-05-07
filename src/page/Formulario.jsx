@@ -22,35 +22,28 @@ const Formulario = () => {
     try {
       const formData = new FormData(formRef.current);
 
+      const nome = formData.get("nome") || "Anônimo";
+      const emailOuTelefone = formData.get("email") || "";
+      const isEmail = emailOuTelefone.includes("@");
+
       // Mapear os dados do formulário para o formato esperado pela API
       const opportunityData = {
-        queueId: 0, // Defina o valor apropriado
-        apiKey: "", // Substitua pela sua chave de API real
-        fkPipeline: 1, // Defina conforme necessário
-        fkStage: 1, // Defina conforme necessário
-        responsableid: 1, // Defina o ID do responsável
+        queueId: 0,
+        apiKey: "string", // <-- substitua com seu valor real
+        fkPipeline: 0,
+        fkStage: 0,
+        responsableid: 0,
         title: `Ocorrência: ${
           formData.get("descricao")?.substring(0, 50) || "Sem título"
-        }`, // Título baseado na descrição
-        clientid: "identificador-cliente", // Defina conforme necessário
-        mainphone: formData.get("email")?.includes("@")
-          ? ""
-          : formData.get("email") || "", // Assume que pode ser telefone
-        mainmail: formData.get("email")?.includes("@")
-          ? formData.get("email")
-          : "", // Email se for válido
-        description: `Detalhes da ocorrência:
-          Nome: ${formData.get("nome") || "Anônimo"}
-          Data/Hora: ${formData.get("data_hora")}
-          Descrição: ${formData.get("descricao")}
-          Ativos Impactados: ${formData.get("ativos")}
-          Impacto: ${formData.get("impacto")}
-          Mitigação: ${formData.get("mitigacao")}
-          Causa: ${formData.get("causa")}`,
+        }`,
+        clientid: "string", // <-- substitua com seu identificador de cliente
+        mainphone: isEmail ? "" : emailOuTelefone,
+        mainmail: isEmail ? emailOuTelefone : "",
+        description: formData.get("descricao"),
         expectedclosedate: new Date(
           Date.now() + 7 * 24 * 60 * 60 * 1000
-        ).toISOString(), // Data de fechamento esperada em 7 dias
-        formattedlocation: "Local não especificado", // Pode ser ajustado
+        ).toISOString(),
+        formattedlocation: "Local não especificado",
         postalcode: "",
         address1: "",
         address2: "",
@@ -60,20 +53,34 @@ const Formulario = () => {
         countrycode: "",
         lat: 0,
         lon: 0,
-        probability: 50, // Probabilidade de 50%
-        value: 0, // Valor monetário, ajuste conforme necessário
+        probability: 0,
+        value: 0,
         recurrentvalue: 0,
-        origin: 1, // Origem do lead/oportunidade
+        origin: 0,
         formsdata: {
+          nome,
+          data_hora: formData.get("data_hora"),
+          ativos: formData.get("ativos"),
+          impacto: formData.get("impacto"),
+          mitigacao: formData.get("mitigacao"),
+          causa: formData.get("causa"),
           anonimo: formData.get("anonimo"),
           confirmacao: formData.get("confirmacao"),
         },
-        tags: [1], // IDs de tags, ajuste conforme necessário
-        files: [], // Será preenchido se houver anexos
-        contacts: [],
-        followers: [],
-        products: [],
+        tags: [0],
+        files: [],
+        contacts: [0],
+        followers: [0],
+        products: [
+          {
+            id: 0,
+            qty: 0,
+            discount: 0,
+          },
+        ],
       };
+
+      console.log("Data enviado", opportunityData);
 
       // Processar anexos se existirem
       const files = formData.getAll("anexo");
