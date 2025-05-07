@@ -26,16 +26,17 @@ const Formulario = () => {
       const emailOuTelefone = formData.get("email") || "";
       const isEmail = emailOuTelefone.includes("@");
 
+      // Dados principais
       const opportunityData = {
         queueId: 0,
-        apiKey: "string", // <-- substitua com seu valor real
+        apiKey: "string", // Substitua por sua chave real
         fkPipeline: 0,
         fkStage: 0,
         responsableid: 0,
         title: `Ocorrência: ${
           formData.get("descricao")?.substring(0, 50) || "Sem título"
         }`,
-        clientid: "string", // <-- substitua com seu identificador de cliente
+        clientid: "string", // Substitua pelo seu clientid
         mainphone: isEmail ? "" : emailOuTelefone,
         mainmail: isEmail ? emailOuTelefone : "",
         description: "Ocorrência registrada via formulário",
@@ -43,13 +44,13 @@ const Formulario = () => {
           Date.now() + 7 * 24 * 60 * 60 * 1000
         ).toISOString(),
         formattedlocation: "Local não especificado",
-        postalcode: "",
-        address1: "",
-        address2: "",
-        city: "",
-        state: "",
-        country: "",
-        countrycode: "",
+        postalcode: formData.get("cep") || "",
+        address1: formData.get("endereco1") || "",
+        address2: formData.get("endereco2") || "",
+        city: formData.get("cidade") || "",
+        state: formData.get("estado") || "",
+        country: formData.get("pais") || "",
+        countrycode: formData.get("codigoPais") || "",
         lat: 0,
         lon: 0,
         probability: 0,
@@ -67,13 +68,13 @@ const Formulario = () => {
           anonimo: formData.get("anonimo"),
           confirmacao: formData.get("confirmacao"),
         },
-        tags: [0],
-        files: [],
-        contacts: [0],
-        followers: [0],
+        tags: [0], // A lista de tags pode estar vazia ou com IDs válidos
+        files: [], // Envie arquivos, se houver
+        contacts: [0], // IDs dos contatos, se necessário
+        followers: [0], // IDs dos seguidores, se necessário
         products: [
           {
-            id: 0,
+            id: 0, // Substitua com dados reais do produto, se aplicável
             qty: 0,
             discount: 0,
           },
@@ -93,6 +94,9 @@ const Formulario = () => {
           body: JSON.stringify(opportunityData),
         }
       );
+
+      console.log("Resposta JSON", response);
+      
 
       if (!response.ok) {
         const errorText = await response.text();
