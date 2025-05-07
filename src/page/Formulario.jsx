@@ -37,7 +37,7 @@ const Formulario = () => {
           formData.get("descricao")?.substring(0, 50) || "Sem título"
         }`,
         clientid: "string", // Substitua pelo seu clientid
-        mainphone: isEmail ? "" : emailOuTelefone,
+        mainphone: isEmail ? "00000-0000" : emailOuTelefone,
         mainmail: isEmail ? emailOuTelefone : "0",
         description: "Ocorrência registrada via formulário",
         expectedclosedate: new Date(
