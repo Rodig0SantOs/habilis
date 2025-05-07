@@ -3,8 +3,6 @@ import style from "./Formulario.module.css";
 import FormField from "../utils/form";
 import Footer from "../components/Footer/Footer";
 
-const API_KEY = import.meta.env.VITE_PUBLIC_APIKEY;
-
 const Formulario = () => {
   const formRef = useRef(null);
   const [formStatus, setFormStatus] = useState(null);
@@ -15,37 +13,107 @@ const Formulario = () => {
     setIsSubmitting(true);
     setFormStatus(null);
 
+    if (!formRef.current) {
+      console.error("formRef.current está indefinido!");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const formData = new FormData(formRef.current);
 
-      // Converter FormData para objeto simples
-      const formValues = Object.fromEntries(formData.entries());
+      const nome = formData.get("nome") || "Anônimo";
+      const emailOuTelefone = formData.get("email") || "";
+      const isEmail = emailOuTelefone.includes("@");
 
-      // Enviar para SEU backend em vez da API diretamente
+      // Dados principais
+      const opportunityData = {
+        queueId: 0,
+        apiKey: "não especificado", // Substitua por sua chave real
+        fkPipeline: 0,
+        fkStage: 0,
+        responsableid: 0,
+        title: `Ocorrência: ${
+          formData.get("descricao")?.substring(0, 50) || "não especificado"
+        }`,
+        clientid: "não especificado", // Substitua pelo seu clientid
+        mainphone: isEmail ? "não especificado" : emailOuTelefone,
+        mainmail: isEmail ? emailOuTelefone : "0",
+        description: formData.get("descricao"),
+        expectedclosedate: new Date(
+          Date.now() + 7 * 24 * 60 * 60 * 1000
+        ).toISOString(),
+        formattedlocation: "Local não especificado",
+        postalcode: formData.get("cep") || "não especificado",
+        address1: formData.get("endereco1") || "não especificado",
+        address2: formData.get("endereco2") || "não especificado",
+        city: formData.get("cidade") || "não especificado",
+        state: formData.get("estado") || "não especificado",
+        country: formData.get("pais") || "não especificado",
+        countrycode: formData.get("codigoPais") || "não especificado",
+        lat: 0,
+        lon: 0,
+        probability: 0,
+        value: 0,
+        recurrentvalue: 0,
+        origin: 0,
+        formsdata: {
+          nome,
+          data_hora: formData.get("data_hora"),
+          descricao: formData.get("descricao"),
+          ativos: formData.get("ativos"),
+          impacto: formData.get("impacto"),
+          mitigacao: formData.get("mitigacao"),
+          causa: formData.get("causa"),
+          anonimo: formData.get("anonimo"),
+          confirmacao: formData.get("confirmacao"),
+        },
+        tags: [0], // A lista de tags pode estar vazia ou com IDs válidos
+        files: [], // Envie arquivos, se houver
+        contacts: [0], // IDs dos contatos, se necessário
+        followers: [0], // IDs dos seguidores, se necessário
+        products: [
+          {
+            id: 0, // Substitua com dados reais do produto, se aplicável
+            qty: 0,
+            discount: 0,
+          },
+        ],
+      };
+
+      console.log("Payload final:", opportunityData);
+
       const response = await fetch(
-        "http://localhost:3001/api/report-incident",
+        "https://suportehabilis.atenderbem.com/webhookcapture/capture/186216716d1c4b25b8d93ddfd6e894f6",
         {
           method: "POST",
           headers: {
+            accept: "application/json",
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            ...formValues,
-            nome: formValues.nome || "Anônimo",
-            // Outros campos que você quer processar
-          }),
+          body: JSON.stringify(opportunityData),
         }
       );
 
-      if (!response.ok) throw new Error(await response.text());
+      console.log("Resposta JSON", response);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Erro detalhado:", errorText);
+        throw new Error(`Erro HTTP: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Resposta da API:", data);
 
       setFormStatus({
         type: "success",
-        message: "Ocorrência registrada com sucesso!",
+        message: "Ocorrência registrada com sucesso no sistema!",
       });
 
       formRef.current.reset();
     } catch (error) {
+      console.error("Erro no envio:", error);
       setFormStatus({
         type: "error",
         message: error.message || "Erro ao registrar ocorrência",
