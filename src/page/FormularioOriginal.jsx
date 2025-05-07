@@ -1,13 +1,17 @@
-/* eslint-disable no-unused-vars */
 import React, { useRef, useState } from "react";
 import style from "./Formulario.module.css";
 import FormField from "../utils/form";
 import Footer from "../components/Footer/Footer";
+import { sendEmail } from "../services/emailService";
+import { uploadFileToImgBB } from "../utils/uploadFile";
 
 const Formulario = () => {
   const formRef = useRef(null);
   const [formStatus, setFormStatus] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const MAX_TOTAL_SIZE = 20 * 1024 * 1024; // 20MB total
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,74 +27,58 @@ const Formulario = () => {
     try {
       const formData = new FormData(formRef.current);
 
-      // Mapear os dados do formulário para o formato esperado pela API
-      const opportunityData = {
-        queueId: 0, // Defina o valor apropriado
-        apiKey: "", // Substitua pela sua chave de API real
-        fkPipeline: 1, // Defina conforme necessário
-        fkStage: 1, // Defina conforme necessário
-        responsableid: 1, // Defina o ID do responsável
-        title: `Ocorrência: ${formData.get("descricao")?.substring(0, 50) || "Sem título"}`, // Título baseado na descrição
-        clientid: "identificador-cliente", // Defina conforme necessário
-        mainphone: formData.get("email")?.includes("@") ? "" : formData.get("email") || "", // Assume que pode ser telefone
-        mainmail: formData.get("email")?.includes("@") ? formData.get("email") : "", // Email se for válido
-        description: `Detalhes da ocorrência:
-          Nome: ${formData.get("nome") || "Anônimo"}
-          Data/Hora: ${formData.get("data_hora")}
-          Descrição: ${formData.get("descricao")}
-          Ativos Impactados: ${formData.get("ativos")}
-          Impacto: ${formData.get("impacto")}
-          Mitigação: ${formData.get("mitigacao")}
-          Causa: ${formData.get("causa")}`,
-        expectedclosedate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // Data de fechamento esperada em 7 dias
-        formattedlocation: "Local não especificado", // Pode ser ajustado
-        postalcode: "",
-        address1: "",
-        address2: "",
-        city: "",
-        state: "",
-        country: "",
-        countrycode: "",
-        lat: 0,
-        lon: 0,
-        probability: 50, // Probabilidade de 50%
-        value: 0, // Valor monetário, ajuste conforme necessário
-        recurrentvalue: 0,
-        origin: 1, // Origem do lead/oportunidade
-        formsdata: {
-          anonimo: formData.get("anonimo"),
-          confirmacao: formData.get("confirmacao")
-        },
-        tags: [1], // IDs de tags, ajuste conforme necessário
-        files: [], // Será preenchido se houver anexos
-        contacts: [],
-        followers: [],
-        products: []
+      // Extrair dados do formulário
+      const formValues = {
+        nome: formData.get("nome") || "",
+        email: formData.get("email") || "",
+        data_hora: formData.get("data_hora"),
+        descricao: formData.get("descricao"),
+        ativos: formData.get("ativos"),
+        impacto: formData.get("impacto"),
+        mitigacao: formData.get("mitigacao"),
+        causa: formData.get("causa"),
+        anonimo: formData.get("anonimo"),
+        confirmacao: formData.get("confirmacao"),
       };
 
-      // Processar anexos se existirem
+      // Processar anexos
       const files = formData.getAll("anexo");
-      const validFiles = Array.from(files).filter(file => file.size > 0);
+      let totalSize = 0;
+      const anexos = [];
 
-      // Enviar a requisição para a API
-      const response = await fetch('https://suportehabilis.atenderbem.com/int/createOpportunity', {
-        method: 'POST',
-        headers: {
-          'accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(opportunityData)
-      });
+      // Filtrar apenas arquivos válidos (tamanho > 0 e existentes)
+      const validFiles = Array.from(files).filter((file) => file.size > 0);
 
-      if (!response.ok) {
-        throw new Error(`Erro HTTP: ${response.status}`);
+      // Verificar tamanhos primeiro
+      for (const file of validFiles) {
+        if (file.size > MAX_FILE_SIZE) {
+          throw new Error(`O arquivo ${file.name} excede o limite de 10MB`);
+        }
+        totalSize += file.size;
       }
 
-      const data = await response.json();
-      
+      if (totalSize > MAX_TOTAL_SIZE) {
+        throw new Error("O tamanho total dos anexos excede 20MB");
+      }
+
+      // Upload dos arquivos válidos para imgBB
+      for (const file of validFiles) {
+        const uploadResult = await uploadFileToImgBB(file);
+        anexos.push({
+          name: file.name,
+          url: uploadResult.url,
+        });
+      }
+
+      // Enviar email com as URLs dos anexos
+      await sendEmail({
+        ...formValues,
+        anexo: anexos,
+      });
+
       setFormStatus({
         type: "success",
-        message: "Ocorrência registrada com sucesso no sistema!",
+        message: "Formulário enviado com sucesso!",
       });
 
       formRef.current.reset();
@@ -98,7 +86,7 @@ const Formulario = () => {
       console.error("Erro no envio:", error);
       setFormStatus({
         type: "error",
-        message: error.message || "Erro ao registrar ocorrência",
+        message: error.message || "Erro ao enviar formulário",
       });
     } finally {
       setIsSubmitting(false);
@@ -117,7 +105,6 @@ const Formulario = () => {
             className={style.form}
             encType="multipart/form-data"
           >
-            {/* Campos do formulário mantidos iguais */}
             <FormField
               label="Nome completo do denunciante (opcional se a denúncia for anônima)."
               type="text"
