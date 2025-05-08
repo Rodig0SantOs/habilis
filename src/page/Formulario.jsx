@@ -30,21 +30,19 @@ const Formulario = () => {
 
       // Dados principais
       const opportunityData = {
-        formsdata: {
-          nome,
-          title: `Ocorrência: ${
-            formData.get("descricao")?.substring(0, 50) || "não especificado"
-          }`,
-          description: formData.get("descricao"),
-          mainmail: isEmail ? emailOuTelefone : "0",
-          data_hora: formData.get("data_hora"),
-          ativos: formData.get("ativos"),
-          impacto: formData.get("impacto"),
-          mitigacao: formData.get("mitigacao"),
-          causa: formData.get("causa"),
-          anonimo: formData.get("anonimo"),
-          confirmacao: formData.get("confirmacao"),
-        },
+        nome,
+        title: `Ocorrência: ${
+          formData.get("descricao")?.substring(0, 50) || "não especificado"
+        }`,
+        description: formData.get("descricao"),
+        mainmail: isEmail ? emailOuTelefone : "0",
+        data_hora: formData.get("data_hora"),
+        ativos: formData.get("ativos"),
+        impacto: formData.get("impacto"),
+        mitigacao: formData.get("mitigacao"),
+        causa: formData.get("causa"),
+        anonimo: formData.get("anonimo"),
+        confirmacao: formData.get("confirmacao"),
       };
 
       console.log("Payload final:", opportunityData);
